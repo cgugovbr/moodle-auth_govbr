@@ -1,0 +1,40 @@
+/*
+ * Plugin de Autenticação Gov.br
+ *
+ * @package    auth_govbr
+ * @copyright  2025 Desenvolvido pela Controladoria Geral da União - (CGU)
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+.loginform .login-identityproviders a[href*="acesso.gov.br"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: #F8F8F8 !important;
+    border: 1px solid #D5D5D5 !important;
+    border-radius: 100em !important;
+    padding: 0 20px !important;
+    font-family: 'Rawline', 'Segoe UI', Arial, sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #1351B4 !important;
+    height: 40px !important;
+    text-decoration: none !important;
+    transition: background-color 0.2s, border-color 0.2s;
+    width: 100% !important;
+    box-shadow: none !important;
+}
+
+.loginform .login-identityproviders a[href*="acesso.gov.br"]:hover {
+    background-color: #EEEEEE !important;
+    border-color: #CCCCCC !important;
+}
+
+.loginform .login-identityproviders a[href*="acesso.gov.br"] img {
+    height: 20px !important;
+    width: auto !important;
+    margin-left: 10px !important;
+    margin-right: 0 !important;
+    vertical-align: middle !important;
+    order: 1 !important;
+}
