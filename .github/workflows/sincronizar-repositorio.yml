@@ -1,0 +1,33 @@
+name: Sincronizar Repositório
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-repository:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Executar espelhamento do repositório
+        env:
+          CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR: ${{ secrets.CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR }}
+          CGU_SYNC_TOKEN_CGUGOVBR: ${{ secrets.CGU_SYNC_TOKEN_CGUGOVBR }}
+        run: |
+          set -e
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Clona o repo cgu-se-dti/moodle-auth_govbr como mirror
+          git clone --mirror https://x-access-token:${CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR}@github.com/cgu-se-dti/moodle-auth_govbr.git cgu-se-dti-mirror
+          cd cgu-se-dti-mirror
+
+          # Faz push para o repo cgugovbr/moodle-auth_govbr
+          git remote add cgugovbr https://x-access-token:${CGU_SYNC_TOKEN_CGUGOVBR}@github.com/cgugovbr/moodle-auth_govbr.git
+          git push cgugovbr refs/heads/main:refs/heads/main
+          git push cgugovbr --tags
