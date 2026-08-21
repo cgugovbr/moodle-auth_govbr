@@ -11,7 +11,10 @@ on:
 
 jobs:
   sync-repository:
-    runs-on: ubuntu-latest
+    # Evita execução no repositório espelho (cgugovbr): o job aparece como
+    # "skipped" sem alocar runner
+    if: github.repository == 'cgu-se-dti/moodle-auth_govbr'
+    runs-on: ubuntu-24.04
     steps:
       - name: Executar espelhamento do repositório
         env:
