@@ -18,7 +18,7 @@ jobs:
           CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR: ${{ secrets.CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR }}
           CGU_SYNC_TOKEN_CGUGOVBR: ${{ secrets.CGU_SYNC_TOKEN_CGUGOVBR }}
         run: |
-          set -e
+          set -euo pipefail
 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
