@@ -24,10 +24,12 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           # Clona o repo cgu-se-dti/moodle-auth_govbr como mirror
-          git clone --mirror https://x-access-token:${CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR}@github.com/cgu-se-dti/moodle-auth_govbr.git cgu-se-dti-mirror
+          git -c "http.extraHeader=Authorization: token ${CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR}" \
+            clone --mirror https://github.com/cgu-se-dti/moodle-auth_govbr.git cgu-se-dti-mirror
           cd cgu-se-dti-mirror
 
           # Faz push para o repo cgugovbr/moodle-auth_govbr
-          git remote add cgugovbr https://x-access-token:${CGU_SYNC_TOKEN_CGUGOVBR}@github.com/cgugovbr/moodle-auth_govbr.git
-          git push cgugovbr refs/heads/main:refs/heads/main
-          git push cgugovbr --tags
+          git -c "http.extraHeader=Authorization: token ${CGU_SYNC_TOKEN_CGUGOVBR}" \
+            push https://github.com/cgugovbr/moodle-auth_govbr.git refs/heads/main:refs/heads/main
+          git -c "http.extraHeader=Authorization: token ${CGU_SYNC_TOKEN_CGUGOVBR}" \
+            push https://github.com/cgugovbr/moodle-auth_govbr.git --tags
