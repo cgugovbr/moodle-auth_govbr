@@ -23,13 +23,18 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Autenticação via header Basic (mesmo formato usado pelo actions/checkout),
+          # evitando embutir tokens nas URLs ou persisti-los em .git/config
+          AUTH_ORIGEM=$(printf 'x-access-token:%s' "${CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR}" | base64 -w0)
+          AUTH_DESTINO=$(printf 'x-access-token:%s' "${CGU_SYNC_TOKEN_CGUGOVBR}" | base64 -w0)
+
           # Clona o repo cgu-se-dti/moodle-auth_govbr como mirror
-          git -c "http.extraHeader=Authorization: token ${CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR}" \
+          git -c "http.extraHeader=Authorization: Basic ${AUTH_ORIGEM}" \
             clone --mirror https://github.com/cgu-se-dti/moodle-auth_govbr.git cgu-se-dti-mirror
           cd cgu-se-dti-mirror
 
           # Faz push para o repo cgugovbr/moodle-auth_govbr
-          git -c "http.extraHeader=Authorization: token ${CGU_SYNC_TOKEN_CGUGOVBR}" \
+          git -c "http.extraHeader=Authorization: Basic ${AUTH_DESTINO}" \
             push https://github.com/cgugovbr/moodle-auth_govbr.git refs/heads/main:refs/heads/main
-          git -c "http.extraHeader=Authorization: token ${CGU_SYNC_TOKEN_CGUGOVBR}" \
+          git -c "http.extraHeader=Authorization: Basic ${AUTH_DESTINO}" \
             push https://github.com/cgugovbr/moodle-auth_govbr.git --tags
