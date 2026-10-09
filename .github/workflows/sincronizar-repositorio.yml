@@ -1,4 +1,4 @@
-name: Sincronizar para rafael7maia
+name: Sincronizar para cgugovbr
 
 on:
   workflow_dispatch:
@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   sync:
+    # Executa somente no repositório de origem; o destino não dispara o espelhamento.
     if: github.repository == 'cgu-se-dti/moodle-auth_govbr'
     runs-on: ubuntu-24.04
     steps:
@@ -28,7 +29,7 @@ jobs:
         with:
           client-id: ${{ vars.REPO_SYNC_APP_ID }}
           private-key: ${{ secrets.REPO_SYNC_PRIVATE_KEY }}
-          owner: rafael7maia
+          owner: cgugovbr
           repositories: moodle-auth_govbr
 
       - name: Espelhar branches e tags
@@ -37,5 +38,12 @@ jobs:
           DST_TOKEN: ${{ steps.dst.outputs.token }}
         run: |
           set -euo pipefail
-          git clone --mirror "https://x-access-token:${SRC_TOKEN}@github.com/cgu-se-dti/moodle-auth_govbr.git" mirror.git
-          git -C mirror.git push --mirror "https://x-access-token:${DST_TOKEN}@github.com/rafael7maia/moodle-auth_govbr.git"
+          git clone --mirror \
+            "https://x-access-token:${SRC_TOKEN}@github.com/cgu-se-dti/moodle-auth_govbr.git" \
+            mirror.git
+          git -C mirror.git push --prune \
+            "https://x-access-token:${DST_TOKEN}@github.com/cgugovbr/moodle-auth_govbr.git" \
+            'refs/heads/*:refs/heads/*'
+          git -C mirror.git push \
+            "https://x-access-token:${DST_TOKEN}@github.com/cgugovbr/moodle-auth_govbr.git" \
+            'refs/tags/*:refs/tags/*'
