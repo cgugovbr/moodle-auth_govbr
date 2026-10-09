@@ -1,43 +1,41 @@
-name: Sincronizar Repositório
-
-permissions:
-  contents: read
+name: Sincronizar para rafael7maia
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  sync-repository:
-    # Evita execução no repositório espelho (cgugovbr): o job aparece como
-    # "skipped" sem alocar runner
+  sync:
     if: github.repository == 'cgu-se-dti/moodle-auth_govbr'
     runs-on: ubuntu-24.04
     steps:
-      - name: Executar espelhamento do repositório
+      - name: Gerar token do App na origem
+        id: src
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.REPO_SYNC_APP_ID }}
+          private-key: ${{ secrets.REPO_SYNC_PRIVATE_KEY }}
+          owner: cgu-se-dti
+          repositories: moodle-auth_govbr
+
+      - name: Gerar token do App no destino
+        id: dst
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.REPO_SYNC_APP_ID }}
+          private-key: ${{ secrets.REPO_SYNC_PRIVATE_KEY }}
+          owner: rafael7maia
+          repositories: moodle-auth_govbr
+
+      - name: Espelhar branches e tags
         env:
-          CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR: ${{ secrets.CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR }}
-          CGU_SYNC_TOKEN_CGUGOVBR: ${{ secrets.CGU_SYNC_TOKEN_CGUGOVBR }}
+          SRC_TOKEN: ${{ steps.src.outputs.token }}
+          DST_TOKEN: ${{ steps.dst.outputs.token }}
         run: |
           set -euo pipefail
-
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Autenticação via header Basic (mesmo formato usado pelo actions/checkout),
-          # evitando embutir tokens nas URLs ou persisti-los em .git/config
-          AUTH_ORIGEM=$(printf 'x-access-token:%s' "${CGU_SYNC_TOKEN_MOODLE_AUTH_GOVBR}" | base64 -w0)
-          AUTH_DESTINO=$(printf 'x-access-token:%s' "${CGU_SYNC_TOKEN_CGUGOVBR}" | base64 -w0)
-
-          # Clona o repo cgu-se-dti/moodle-auth_govbr como mirror
-          git -c "http.extraHeader=Authorization: Basic ${AUTH_ORIGEM}" \
-            clone --mirror https://github.com/cgu-se-dti/moodle-auth_govbr.git cgu-se-dti-mirror
-          cd cgu-se-dti-mirror
-
-          # Faz push para o repo cgugovbr/moodle-auth_govbr
-          git -c "http.extraHeader=Authorization: Basic ${AUTH_DESTINO}" \
-            push https://github.com/cgugovbr/moodle-auth_govbr.git refs/heads/main:refs/heads/main
-          git -c "http.extraHeader=Authorization: Basic ${AUTH_DESTINO}" \
-            push https://github.com/cgugovbr/moodle-auth_govbr.git --tags
+          git clone --mirror "https://x-access-token:${SRC_TOKEN}@github.com/cgu-se-dti/moodle-auth_govbr.git" mirror.git
+          git -C mirror.git push --mirror "https://x-access-token:${DST_TOKEN}@github.com/rafael7maia/moodle-auth_govbr.git"
