@@ -10,6 +10,9 @@ permissions:
 
 jobs:
   sync:
+    # O workflow é replicado no destino; execute-o somente em repositórios da
+    # organização de origem para evitar uma sincronização recursiva.
+    if: github.repository_owner == 'cgu-se-dti'
     runs-on: ubuntu-latest
     steps:
       - name: Gerar token do App na origem
@@ -36,12 +39,17 @@ jobs:
           DST_TOKEN: ${{ steps.dst.outputs.token }}
         run: |
           set -euo pipefail
-          git clone --mirror \
-            "https://x-access-token:${SRC_TOKEN}@github.com/cgu-se-dti/moodle-auth_govbr.git" \
+          git -c "http.extraHeader=Authorization: Bearer ${SRC_TOKEN}" \
+            clone --mirror \
+            "https://github.com/cgu-se-dti/moodle-auth_govbr.git" \
             mirror.git
-          git -C mirror.git push --prune \
-            "https://x-access-token:${DST_TOKEN}@github.com/cgugovbr/moodle-auth_govbr.git" \
+          git -C mirror.git \
+            -c "http.extraHeader=Authorization: Bearer ${DST_TOKEN}" \
+            push --prune \
+            "https://github.com/cgugovbr/moodle-auth_govbr.git" \
             'refs/heads/*:refs/heads/*'
-          git -C mirror.git push \
-            "https://x-access-token:${DST_TOKEN}@github.com/cgugovbr/moodle-auth_govbr.git" \
+          git -C mirror.git \
+            -c "http.extraHeader=Authorization: Bearer ${DST_TOKEN}" \
+            push --prune \
+            "https://github.com/cgugovbr/moodle-auth_govbr.git" \
             'refs/tags/*:refs/tags/*'
