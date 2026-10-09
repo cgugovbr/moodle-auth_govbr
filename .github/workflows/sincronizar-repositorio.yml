@@ -39,17 +39,20 @@ jobs:
           DST_TOKEN: ${{ steps.dst.outputs.token }}
         run: |
           set -euo pipefail
-          git -c "http.extraHeader=Authorization: Bearer ${SRC_TOKEN}" \
+          SRC_AUTH=$(printf 'x-access-token:%s' "${SRC_TOKEN}" | base64 -w0)
+          DST_AUTH=$(printf 'x-access-token:%s' "${DST_TOKEN}" | base64 -w0)
+
+          git -c "http.extraHeader=Authorization: Basic ${SRC_AUTH}" \
             clone --mirror \
             "https://github.com/cgu-se-dti/moodle-auth_govbr.git" \
             mirror.git
           git -C mirror.git \
-            -c "http.extraHeader=Authorization: Bearer ${DST_TOKEN}" \
+            -c "http.extraHeader=Authorization: Basic ${DST_AUTH}" \
             push --prune \
             "https://github.com/cgugovbr/moodle-auth_govbr.git" \
-            'refs/heads/*:refs/heads/*'
+            '+refs/heads/*:refs/heads/*'
           git -C mirror.git \
-            -c "http.extraHeader=Authorization: Bearer ${DST_TOKEN}" \
+            -c "http.extraHeader=Authorization: Basic ${DST_AUTH}" \
             push --prune \
             "https://github.com/cgugovbr/moodle-auth_govbr.git" \
-            'refs/tags/*:refs/tags/*'
+            '+refs/tags/*:refs/tags/*'
