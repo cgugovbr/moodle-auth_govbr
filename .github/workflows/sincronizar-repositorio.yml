@@ -10,9 +10,7 @@ permissions:
 
 jobs:
   sync:
-    # Executa somente no repositório de origem; o destino não dispara o espelhamento.
-    if: github.repository == 'cgu-se-dti/moodle-auth_govbr'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Gerar token do App na origem
         id: src
