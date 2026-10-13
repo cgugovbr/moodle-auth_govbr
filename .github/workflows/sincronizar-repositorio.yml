@@ -1,12 +1,12 @@
 name: Sincronizar para cgugovbr
 
+permissions:
+  contents: read
+
 on:
   workflow_dispatch:
   push:
     branches: [main]
-
-permissions:
-  contents: read
 
 jobs:
   sync:
@@ -33,7 +33,7 @@ jobs:
           owner: cgugovbr
           repositories: moodle-auth_govbr
 
-      - name: Espelhar branches e tags
+      - name: Espelhar branch main e tags
         env:
           SRC_TOKEN: ${{ steps.src.outputs.token }}
           DST_TOKEN: ${{ steps.dst.outputs.token }}
@@ -50,7 +50,7 @@ jobs:
             -c "http.extraHeader=Authorization: Basic ${DST_AUTH}" \
             push --prune \
             "https://github.com/cgugovbr/moodle-auth_govbr.git" \
-            '+refs/heads/*:refs/heads/*'
+            '+refs/heads/main:refs/heads/main'
           git -C mirror.git \
             -c "http.extraHeader=Authorization: Basic ${DST_AUTH}" \
             push --prune \
